@@ -19,7 +19,7 @@ from collections import defaultdict
 from datetime import timedelta
 
 
-FILE_NAME = "../abnormalTransactionDetection.xlsx"
+FILE_NAME = "./abnormalTransactionDetection.xlsx"
 TIME_WINDOW_SECONDS = 60      # 같은 심볼/같은 방향으로 묶을 시점 차이(초)
 MIN_GROUP_SIZE = 2            # 그룹으로 판단할 최소 계정 수
 SCORE_WEIGHTS = {
@@ -309,6 +309,25 @@ def main():
     } for g in scored_groups_sorted])
 
     sg_df.to_csv("suspicious_groups.csv", index=False)
+
+    # # --------------------------
+    # # 하이퍼파라미터 (기업별 경고 기준 조정용)
+    # # --------------------------
+    # SUSPICIOUS_THRESHOLD = 0.5  # 예: 0.7 이상이면 경고로 표시
+    #
+    # # 의심 그룹만 필터링
+    # suspicious_groups = [g for g in scored_groups_sorted if g['combined_score'] >= SUSPICIOUS_THRESHOLD]
+    #
+    # # CSV로 전체/의심 그룹 분리 저장
+    # all_groups_df = pd.DataFrame(scored_groups_sorted)
+    # suspicious_df = pd.DataFrame(suspicious_groups)
+    #
+    # all_groups_df.to_csv("all_groups.csv", index=False)
+    # suspicious_df.to_csv("suspicious_groups_filtered.csv", index=False)
+    #
+    # print(f"\n✅ 전체 그룹 {len(all_groups_df)}개 중 의심 그룹 {len(suspicious_df)}개 탐지됨 (threshold={SUSPICIOUS_THRESHOLD})")
+
+
 
     # 의심 계정별 수익
     suspicious_accounts = set()
