@@ -16,6 +16,38 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 from collections import defaultdict
+def load_sheets(file_name):
+    """
+    Excel 파일에서 시트별로 데이터를 불러옴
+    Trade, Funding, Reward, IP, Spec 시트를 가져옴
+    """
+    if not os.path.exists(file_name):
+        raise FileNotFoundError(f"{file_name} not found in cwd={os.getcwd()}")
+    sheets = pd.read_excel(file_name, sheet_name=None)
+    trade = sheets.get('Trade')
+    funding = sheets.get('Funding')
+    reward = sheets.get('Reward')
+    ip = sheets.get('IP')
+    spec = sheets.get('Spec')
+    return trade, funding, reward, ip, spec
+
+def load_sheets(file_name):
+    """
+    Excel 파일에서 시트별로 데이터를 불러옴
+    Trade, Funding, Reward, IP, Spec 시트를 가져옴
+    """
+    if not os.path.exists(file_name):
+        raise FileNotFoundError(f"{file_name} not found in cwd={os.getcwd()}")
+    sheets = pd.read_excel(file_name, sheet_name=None)
+    trade = sheets.get('Trade')
+    funding = sheets.get('Funding')
+    reward = sheets.get('Reward')
+    ip = sheets.get('IP')
+    spec = sheets.get('Spec')
+
+# from abnormal_detector import load_sheets, calc_account_profits, find_time_synced_groups
+FILE_NAME = "abnormalTransactionDetection.xlsx"
+
 from datetime import timedelta
 
 
@@ -310,22 +342,25 @@ def main():
 
     sg_df.to_csv("suspicious_groups.csv", index=False)
 
-    # # --------------------------
-    # # 하이퍼파라미터 (기업별 경고 기준 조정용)
-    # # --------------------------
-    # SUSPICIOUS_THRESHOLD = 0.5  # 예: 0.7 이상이면 경고로 표시
-    #
-    # # 의심 그룹만 필터링
-    # suspicious_groups = [g for g in scored_groups_sorted if g['combined_score'] >= SUSPICIOUS_THRESHOLD]
-    #
-    # # CSV로 전체/의심 그룹 분리 저장
-    # all_groups_df = pd.DataFrame(scored_groups_sorted)
-    # suspicious_df = pd.DataFrame(suspicious_groups)
-    #
-    # all_groups_df.to_csv("all_groups.csv", index=False)
-    # suspicious_df.to_csv("suspicious_groups_filtered.csv", index=False)
-    #
-    # print(f"\n✅ 전체 그룹 {len(all_groups_df)}개 중 의심 그룹 {len(suspicious_df)}개 탐지됨 (threshold={SUSPICIOUS_THRESHOLD})")
+    # --------------------------
+    # 하이퍼파라미터 (기업별 경고 기준 조정용)
+    # --------------------------
+    # 0.35는 “의심 시작” 기준
+    # 0.65는 “확정 조직적 패턴” 기준
+    SUSPICIOUS_THRESHOLD = 0.65  #기업 평균 기준(0.3~0.35)
+
+
+    # 의심 그룹만 필터링
+    suspicious_groups = [g for g in scored_groups_sorted if g['combined_score'] >= SUSPICIOUS_THRESHOLD]
+
+    # CSV로 전체/의심 그룹 분리 저장
+    all_groups_df = pd.DataFrame(scored_groups_sorted)
+    suspicious_df = pd.DataFrame(suspicious_groups)
+
+    all_groups_df.to_csv("all_groups.csv", index=False)
+    suspicious_df.to_csv("suspicious_groups_filtered.csv", index=False)
+
+    print(f"\n✅ 전체 그룹 {len(all_groups_df)}개 중 의심 그룹 {len(suspicious_df)}개 탐지됨 (threshold={SUSPICIOUS_THRESHOLD})")
 
 
 
